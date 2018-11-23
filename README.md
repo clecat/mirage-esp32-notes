@@ -7,28 +7,29 @@ Notes may sometime be written in French, I will translate them as soon as I can.
 
 ## Graphic driver
 
-Pour l'odroid-go, il faut changer le driver de lortex: en effet, les pins utilisées dans l'appareil ne sont pas les mêmes que dans celui qu'il utilisais.
-Ce problème est d'ailleurs très certainement extensible à tout les autres appareils.
-Afin de le résoudre, j'ai cherché dans les sources des drivers C++ données par le fabriquant ("Display.cpp").
-De plus, il est nécessaire de changer les numéros des pins correspondantes, mais aussi la suite de bits envoyés à l'écran à l'initialisation. Je l'ai trouvé dans le même fichier.
+In order to used @lortex code for esp32 on the Odroid-Go, I need to modify the lcd driver: Indeed the pins used by the device are not the same as the pins used in @lortex device.
+And I suppose this does not only exist for the Odroid-Go. In order to solve it, I searched in the sources of the C++ drivers given by the manufacturer ("Display.cpp"), the pins numbers were listed here.
+Moreover, I needed to modify the arrays of bits sent to the screen upon initialization (I found the good ones in the same file as the pins).
 
-__Problèmes à résoudre:__
+__Problems to solve:__
 
-Le code source C++ mentionnais une pin de reset avec une valeur de 0.
-Je dois trouver un moyen de passer outre, sachant que cette valeur fait planter le code initial.
-Le rétro éclairege de l'écran n'est pas géré par le driver que j'ai retouché.
+The C++ code give a value of 0 for the reset pin.
+The problem is, using this value makes the program crash, so I disabled all uses of this pin until I solve this.
+Finally, the LCD backlight seems to be never lighted with my modified driver.
 
 ## Flashing and launching the app on the odroid
 
-Pour ce faire, suivez le tutoriel de well-typed-lightbulbs/mirage-samples-esp32.
-Quelques remarques supplémentaires:
-* La RAM:
-    * Les esp32 sont dotés d'une RAM extrêmement faible, si votre appareil contient donc de la RAM en spi, vous pouvez l'utiliser. Néanmoins, souvenez vous que la RAM SPI ne permet pas d'allouer des ressources dont l'accés est nécessaire en DMA (ex: buffer pour le lcd etc).
-* Dans menuconfig:
-    * Pour activer la RAM SPI, aller dans component config -> esp32 specific -> 2nd choix
-    * Augmentez la taille de la flash (16 mb sur l'Odroid) dans flasher config -> flash size
-    * Vous aurez besoin de python2 pour continuer. Si votre python par défault est python3, vous pouvez créer un virtualenv ou bien modifier SDKtoolconfig -> python en spécifiant python2
-* Pour le flash:
-    * Mettez à jour votre environnement avec le PATH menant à votre instance de xtensia.
-* Pour le monitor:
-    * Le raccourci pour quitter l'application est ctrl + ]. Si votre clavier est un azerty, utilisez ctrl + altgr + ).
+In order to do this, just follow the turorial given here: well-typed-lightbulbs/mirage-samples-esp32.
+The following lines are additionnal observations:
+* RAM:
+    * esp32's RAM is really low (about a few hundred of kb generally), so if your device contains additionnal RAM in SPI, you need to activate it during the configuration. However, you need to be aware that SPI RAM does not allow to allocate DMA buffers, so you will not be able to use them for transactions between the elements of the esp (e.g. the buffer needed for the LCD screen transactions).
+* Menuconfig:
+    * In order to activate the SPI RAM, go in component config -> esp specific and select the 2nd choice ('y')
+    * You will need to increase the size of the flash (16 mb on the Odroid) in flasher config -> flash size
+    * You will need python2 in order to continue. If your python instance by default is python3, you can create a new virtualenv or modify  SDKtoolconfig -> python by giving python2 instead of python
+* Flash:
+    * Update your environment with the PATH leading to your instance of xtensia.
+* Monitor:
+    * The shortcut for leaving the app is ctrl + ]. If your keyboard is in azerty, use ctrl + altgr + ) instead.
+* LCD screen:
+    * It may be a bad use case from me, but it seems that the drivers places the point (0, 0) in the top right corner of the screen.
