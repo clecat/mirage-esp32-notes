@@ -5,6 +5,8 @@ Important note: I'm using the Odroid-Go model, every informations noted here sho
 
 Notes may sometime be written in French, I will translate them as soon as I can.
 
+The file esp32.conf is the configuration I load in menuconfig :)
+
 ## Graphic driver
 
 In order to used @lortex code for esp32 on the Odroid-Go, I need to modify the lcd driver: Indeed the pins used by the device are not the same as the pins used in @lortex device.
